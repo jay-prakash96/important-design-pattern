@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: design-pattern-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: design-pattern-app
+  template:
+    metadata:
+      labels:
+        app: design-pattern-app
+    spec:
+      containers:
+      - name: app
+        image: ${ECR_REPO}:${IMAGE_TAG}
+        ports:
+        - containerPort: 8080

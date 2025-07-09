@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: design-pattern-service
+spec:
+  type: ClusterIP
+  selector:
+    app: design-pattern-app
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
