@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    tools {
+        maven 'Maven 3'
+    }
 
     environment {
         AWS_REGION = 'us-east-1'
@@ -11,6 +14,12 @@ pipeline {
         stage('Checkout') {
             steps {
                 git 'https://github.com/jay-prakash96/important-design-pattern.git'
+            }
+        }
+        stage('Debug Maven') {
+            steps {
+                sh 'echo $PATH'
+                sh 'mvn -version'
             }
         }
         stage('Build JAR') {
