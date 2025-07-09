@@ -53,7 +53,7 @@ pipeline {
         stage('Substitute Image in YAML') {
             steps {
                 sh """
-                  sed -i 's|image: .*|image: $ECR_REPO:$IMAGE_TAG|' k8s/deployment.yaml
+                  sed -i '' 's|image: .*|image: $ECR_REPO:$IMAGE_TAG|' k8s/deployment.yaml
                 """
             }
         }
