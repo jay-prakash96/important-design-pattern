@@ -5,7 +5,7 @@ FROM eclipse-temurin:17-jdk-jammy
 WORKDIR /app
 
 # Copy the Spring Boot jar file
-COPY target/importnat-design-pattern-*.jar app.jar
+COPY target/important-design-pattern-*.jar app.jar
 
 # Expose port 8080 (Spring Boot default)
 EXPOSE 8080
