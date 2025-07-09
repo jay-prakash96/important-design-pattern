@@ -1,4 +1,173 @@
-# Important GoF Design Patterns in Spring Boot
+# Spring Boot GoF Design Patterns: End-to-End CI/CD on AWS EKS
+
+This guide documents all the steps required to develop, containerize, and deploy this Spring Boot project (with GoF patterns) to AWS EKS using Jenkins, Docker, and Kubernetes.
+
+---
+
+## 1. Project Setup & Development
+
+### 1.1. Scaffold the Spring Boot Project
+- Create a new directory:
+  ```sh
+  mkdir importnat-design-pattern && cd importnat-design-pattern
+  ```
+- Scaffold a Spring Boot project manually or via [Spring Initializr](https://start.spring.io/).
+- Add required dependencies in `pom.xml` (Spring Web, logging, etc).
+
+### 1.2. Implement GoF Design Patterns
+- Implement patterns (Singleton, Factory, Observer, etc.) as Java classes.
+- Each pattern:
+  - Has a real-life, interview-ready explanation in comments
+  - Is exposed as a REST endpoint
+- Enable file logging in `src/main/resources/application.properties`:
+  ```properties
+  logging.file.name=logs/spring-boot-app.log
+  logging.level.root=INFO
+  ```
+
+### 1.3. Version Control
+- Initialize git:
+  ```sh
+  git init
+  git remote add origin https://github.com/<your-username>/important-design-pattern.git
+  git add .
+  git commit -m "Initial commit"
+  git push -u origin main
+  ```
+
+---
+
+## 2. Dockerization
+
+### 2.1. Create a Dockerfile
+```dockerfile
+FROM eclipse-temurin:17-jre-alpine
+COPY target/*.jar app.jar
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "/app.jar"]
+```
+
+### 2.2. Build and Run Locally
+```sh
+mvn clean package -DskipTests
+docker build -t important-design-pattern:latest .
+docker run -p 8080:8080 important-design-pattern:latest
+```
+
+---
+
+## 3. Kubernetes Manifests
+- Create `k8s/deployment.yaml`, `k8s/service.yaml`, `k8s/ingress.yaml`.
+- Use placeholders for image tag (to be replaced in CI/CD).
+- Ingress allows access via external IP (no custom domain required).
+
+---
+
+## 4. AWS Setup
+
+### 4.1. EKS Cluster
+```sh
+eksctl create cluster --name design-pattern-cluster --region us-east-1
+```
+
+### 4.2. ECR Repository
+```sh
+aws ecr create-repository --repository-name important-design-pattern --region us-east-1
+```
+
+---
+
+## 5. Jenkins CI/CD Pipeline
+
+### 5.1. Jenkins Installation
+- Install Jenkins on your host (recommended for Mac):
+  ```sh
+  brew install jenkins-lts
+  brew services start jenkins-lts
+  ```
+- Ensure Jenkins can access Maven, Docker, AWS CLI, and kubectl by adding their paths in the Jenkinsfile:
+  ```groovy
+  environment {
+      PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
+      ...
+  }
+  ```
+
+### 5.2. Jenkinsfile Pipeline
+- Checkout code from GitHub
+- Build JAR with Maven
+- Build and tag Docker image
+- Authenticate to ECR and push image
+- Substitute image tag in `deployment.yaml` (macOS: `sed -i '' ...`)
+- Update kubeconfig and deploy manifests to EKS
+
+**Sample image substitution:**
+```groovy
+sh """
+  sed -i '' 's|image: .*|image: $ECR_REPO:$IMAGE_TAG|' k8s/deployment.yaml
+"""
+```
+
+### 5.3. Jenkins Credentials
+- Add AWS credentials in Jenkins (ID: `aws-jenkins-creds`).
+
+---
+
+## 6. Deployment & Verification
+
+### 6.1. Run Jenkins Pipeline
+- Trigger the Jenkins job.
+- Watch logs for errors and fix as needed (PATH, permissions, etc).
+
+### 6.2. Get Ingress Endpoint
+```sh
+kubectl get ingress
+```
+Wait until the `ADDRESS` column is populated.
+
+### 6.3. Access the Application
+- Open `http://<EXTERNAL-IP>` in your browser or use:
+  ```sh
+  curl http://<EXTERNAL-IP>
+  ```
+
+---
+
+## 7. Troubleshooting
+
+- **Tool not found (`mvn`, `docker`, `aws`):** Add their install paths to the Jenkinsfile `PATH`.
+- **ECR repo does not exist:** Create it with `aws ecr create-repository ...`
+- **Ingress ADDRESS is empty:** Wait for LoadBalancer provisioning; check Ingress controller logs if it takes too long.
+- **Kubernetes errors:** Use `kubectl get pods,svc,ingress` and `kubectl describe` for debugging.
+
+---
+
+## 8. Best Practices & Notes
+
+- Use `main` as your default branch unless legacy systems require `master`.
+- Document endpoints and design patterns in your README.
+- Use AWS IAM roles for secure EKS and ECR access in production.
+- For production, consider SSL/TLS for Ingress and restrict public access.
+
+---
+
+## Example: Test a REST Endpoint
+
+Once deployed, test any endpoint (e.g., Singleton):
+```sh
+curl http://<EXTERNAL-IP>/singleton
+```
+
+---
+
+## References
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Docker](https://www.docker.com/)
+- [Kubernetes](https://kubernetes.io/)
+- [AWS EKS](https://docs.aws.amazon.com/eks/)
+- [AWS ECR](https://docs.aws.amazon.com/AmazonECR/latest/userguide/)
+- [Jenkins](https://www.jenkins.io/)
+
 
 This project demonstrates the most important Gang of Four (GoF) design patterns with real-life, interview-ready explanations and runnable REST endpoints using Java Spring Boot. Each pattern includes:
 - A real-world analogy for interview discussion
