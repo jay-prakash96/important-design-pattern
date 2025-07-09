@@ -10,7 +10,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/yourusername/importnat-design-pattern.git'
+                git 'https://github.com/jay-prakash96/importnat-design-pattern.git'
             }
         }
         stage('Build JAR') {
