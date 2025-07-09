@@ -3,14 +3,14 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        ECR_REPO = '730335674924.dkr.ecr.us-east-1.amazonaws.com/importnat-design-pattern'
+        ECR_REPO = '730335674924.dkr.ecr.us-east-1.amazonaws.com/important-design-pattern'
         IMAGE_TAG = "${env.BUILD_NUMBER}"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/jay-prakash96/importnat-design-pattern.git'
+                git 'https://github.com/jay-prakash96/important-design-pattern.git'
             }
         }
         stage('Build JAR') {
