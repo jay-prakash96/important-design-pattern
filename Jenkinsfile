@@ -27,6 +27,13 @@ pipeline {
                 sh 'mvn clean package -DskipTests'
             }
         }
+        stage('Debug Docker') {
+            steps {
+                sh 'echo $PATH'
+                sh 'which docker'
+                sh 'docker --version'
+            }
+        }
         stage('Docker Build') {
             steps {
                 sh "docker build -t $ECR_REPO:$IMAGE_TAG ."
